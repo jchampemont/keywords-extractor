@@ -10,9 +10,7 @@ import java.io.InputStream;
 import java.util.List;
 
 @RunWith(JUnit4.class)
-public class KeywordsExtractorTest {
-
-    private KeywordsExtractor extractor;
+public class FrenchKeywordsExtractorTest extends AbstractKeywordsExtractorTest {
 
     @Before
     public void init() {
@@ -29,13 +27,4 @@ public class KeywordsExtractorTest {
         doTest(openExampleFile("lemonde.fr-tunnel.txt"));
     }
 
-    private InputStream openExampleFile(String name) {
-        String filename = "/examples/" + name;
-        return getClass().getResourceAsStream(filename);
-    }
-
-    private void doTest(InputStream stream) throws IOException {
-        List<Keyword> keywords = extractor.extract(stream);
-        System.out.println(keywords);
-    }
 }

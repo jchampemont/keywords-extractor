@@ -3,7 +3,6 @@ package com.jeanchampemont.nlp;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultiset;
 import com.jeanchampemont.nlp.internal.org.tartarus.snowball.SnowballStemmer;
-import com.jeanchampemont.nlp.internal.org.tartarus.snowball.ext.frenchStemmer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,7 +12,6 @@ import java.util.*;
 
 /**
  * Main class for the keywords-extractor library.
- *
  */
 public class KeywordsExtractor {
     private static final String RESOURCES_PATH = "/lang/";
@@ -32,7 +30,7 @@ public class KeywordsExtractor {
 
     public KeywordsExtractor(KeywordsExtractorConfiguration configuration) {
         Preconditions.checkNotNull(configuration);
-        instanciateStemmer(configuration.getLanguage());
+        stemmer = configuration.getLanguage().getStemmer();
         readAlphabet(configuration.getLanguage());
         readStopWords(configuration.getLanguage());
         percentile = configuration.getPercentile();
@@ -40,6 +38,7 @@ public class KeywordsExtractor {
 
     /**
      * Extract a list of keywords for the specified text
+     *
      * @param text
      * @return list of main keywords
      * @throws IOException when error while reading from stream occurs
@@ -49,18 +48,19 @@ public class KeywordsExtractor {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(text));
 
-        HashMultiset<String> stemmedWords = HashMultiset.<String> create();
+        HashMultiset<String> stemmedWords = HashMultiset.<String>create();
 
         StringBuilder currentWord = new StringBuilder();
         int ci = reader.read();
-        while( ci != -1) { //browsing the text, char by char
+        //TODO implement capitalized words recognition
+        while (ci != -1) { //browsing the text, char by char
             char c = Character.toLowerCase((char) ci);
-            if(alphabet.contains(c)) { //if current char is in the alphabet
+            if (alphabet.contains(c)) { //if current char is in the alphabet
                 currentWord.append(c); //it is the next char of the current word
             } else {                   //else we have a word!
                 String word = currentWord.toString();
                 currentWord = new StringBuilder();
-                if(!word.isEmpty() && ! stopWords.contains(word)) { //if the word is not a stop word
+                if (!word.isEmpty() && !stopWords.contains(word)) { //if the word is not a stop word
                     stemmer.setCurrent(word);
                     stemmer.stem();
                     String stemmedWord = stemmer.getCurrent();
@@ -72,7 +72,7 @@ public class KeywordsExtractor {
         //counting words and computing relevance
         int totalWordsCount = stemmedWords.size();
         List<Keyword> result = new ArrayList<>();
-        for(String word : stemmedWords.elementSet()) {
+        for (String word : stemmedWords.elementSet()) {
             Keyword keyword = new Keyword();
             keyword.setWord(word);
             keyword.setRelevance(stemmedWords.count(word) / (double) totalWordsCount);
@@ -82,19 +82,11 @@ public class KeywordsExtractor {
         double relevanceSum = 0;
         int i = 0;
         //keeping only the specified percentile of keywords
-        while(relevanceSum < percentile) {
+        while (relevanceSum < percentile) {
             relevanceSum += result.get(i).getRelevance();
             i++;
         }
-        return result.subList(0, Math.max(1, i-1));
-    }
-
-    private void instanciateStemmer(StemmerLanguage language) {
-        if(StemmerLanguage.FRENCH.equals(language)) {
-            stemmer = new frenchStemmer();
-        } else {
-            throw new IllegalArgumentException("unsupported language: " + language.name());
-        }
+        return result.subList(0, Math.max(1, i - 1));
     }
 
     private void readAlphabet(StemmerLanguage language) {
@@ -109,7 +101,7 @@ public class KeywordsExtractor {
 
         try {
             String line = reader.readLine();
-            while(line != null) {
+            while (line != null) {
                 alphabet.add(line.charAt(0));
                 line = reader.readLine();
             }
@@ -130,7 +122,7 @@ public class KeywordsExtractor {
 
         try {
             String line = reader.readLine();
-            while(line != null) {
+            while (line != null) {
                 stopWords.add(line.trim());
                 line = reader.readLine();
             }
