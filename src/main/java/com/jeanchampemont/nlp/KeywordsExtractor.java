@@ -52,20 +52,33 @@ public class KeywordsExtractor {
 
         StringBuilder currentWord = new StringBuilder();
         int ci = reader.read();
-        //TODO implement capitalized words recognition
+        boolean isNewSentence = true;
+        boolean stemCurrentWord = true;
         while (ci != -1) { //browsing the text, char by char
-            char c = Character.toLowerCase((char) ci);
+            char c = (char) Character.toLowerCase(ci);
             if (alphabet.contains(c)) { //if current char is in the alphabet
+                if (!isNewSentence && Character.isUpperCase(ci)) {
+                    stemCurrentWord = false;
+                }
                 currentWord.append(c); //it is the next char of the current word
+                isNewSentence = false;
             } else {                   //else we have a word!
                 String word = currentWord.toString();
                 currentWord = new StringBuilder();
                 if (!word.isEmpty() && !stopWords.contains(word)) { //if the word is not a stop word
-                    stemmer.setCurrent(word);
-                    stemmer.stem();
-                    String stemmedWord = stemmer.getCurrent();
+                    String stemmedWord = word;
+                    if (stemCurrentWord) {
+                        stemmer.setCurrent(word);
+                        stemmer.stem();
+                        stemmedWord = stemmer.getCurrent();
+                    }
                     stemmedWords.add(stemmedWord);
                 }
+
+                if (c == '.') {
+                    isNewSentence = true;
+                }
+                stemCurrentWord = true;
             }
             ci = reader.read();
         }
