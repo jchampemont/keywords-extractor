@@ -22,7 +22,7 @@ if [ "$TRAVIS_REPO_SLUG" == "$REPO_SLUG" ] && [ "$TRAVIS_JDK_VERSION" == "oracle
 
   echo -e "Publishing javadoc...\n"
 
-  cp -R $1/build/docs/javadoc $HOME/$1-javadoc-latest
+  cp -R build/docs/javadoc $HOME/$1-javadoc-latest
 
   cd $HOME
   git clone --quiet --branch=gh-pages https://${GH_TOKEN}@github.com/$JAVADOC_REPO_SLUG gh-pages > /dev/null
