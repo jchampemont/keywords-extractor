@@ -74,8 +74,8 @@ public class KeywordsExtractor {
                         stemmer.setCurrent(word);
                         stemmer.stem();
                         stemmedWord = stemmer.getCurrent();
-                        wordsByStem.put(stemmedWord, word);
                     }
+                    wordsByStem.put(stemmedWord, word);
                     stemmedWords.add(stemmedWord);
                 }
 
