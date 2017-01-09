@@ -5,4 +5,4 @@ after_success:
   - ./publish.sh keywords-extractor
 cache:
   directories:
-- $HOME/.gradle/
+    - $HOME/.gradle/
