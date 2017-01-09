@@ -225,3 +225,7 @@ new
 old
 high
 long
+mr
+miss
+mrs
+ms
