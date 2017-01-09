@@ -1,7 +1,9 @@
 package com.jeanchampemont.nlp;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multimap;
 import com.jeanchampemont.nlp.internal.org.tartarus.snowball.SnowballStemmer;
 
 import java.io.BufferedReader;
@@ -49,6 +51,7 @@ public class KeywordsExtractor {
         BufferedReader reader = new BufferedReader(new InputStreamReader(text));
 
         HashMultiset<String> stemmedWords = HashMultiset.<String>create();
+        Multimap<String, String> wordsByStem = ArrayListMultimap.<String, String>create();
 
         StringBuilder currentWord = new StringBuilder();
         int ci = reader.read();
@@ -71,6 +74,7 @@ public class KeywordsExtractor {
                         stemmer.setCurrent(word);
                         stemmer.stem();
                         stemmedWord = stemmer.getCurrent();
+                        wordsByStem.put(stemmedWord, word);
                     }
                     stemmedWords.add(stemmedWord);
                 }
@@ -85,10 +89,11 @@ public class KeywordsExtractor {
         //counting words and computing relevance
         int totalWordsCount = stemmedWords.size();
         List<Keyword> result = new ArrayList<>();
-        for (String word : stemmedWords.elementSet()) {
+        for (String stem : stemmedWords.elementSet()) {
             Keyword keyword = new Keyword();
-            keyword.setWord(word);
-            keyword.setRelevance(stemmedWords.count(word) / (double) totalWordsCount);
+            keyword.setStem(stem);
+            keyword.setRelevance(stemmedWords.count(stem) / (double) totalWordsCount);
+            keyword.setWords(new HashSet<>(wordsByStem.get(stem)));
             result.add(keyword);
         }
         Collections.sort(result);
