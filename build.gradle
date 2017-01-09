@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 group = 'com.jeanchampemont.nlp'
-version = '0.1.0-SNAPSHOT'
+version = '0.1.0'
 
 description = "keywords-extractor"
 
